@@ -1,40 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:learn_kids_app/src/classes/languages.dart';
-
 import 'package:learn_kids_app/src/pages/settings_page.dart';
 
 enum WhyFarther { configuration, darkMode, lightMode }
 
-class PopUpMenuButtonWidget extends StatefulWidget {
-  @override
-  _PopUpMenuButtonWidgetState createState() => _PopUpMenuButtonWidgetState();
-}
-
-class _PopUpMenuButtonWidgetState extends State<PopUpMenuButtonWidget> {
-  WhyFarther _selection;
+class PopUpMenuButtonWidget extends StatelessWidget {
+  const PopUpMenuButtonWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return PopupMenuButton(
-      onSelected: (WhyFarther result) {
-        setState(() {
-          _selection = result;
-          if(_selection == WhyFarther.configuration) {
-            Navigator.pushReplacementNamed(context, SettingsPage.routeName);
-          }
-          print(_selection);
-        });
+    return PopupMenuButton<WhyFarther>(
+      onSelected: (result) {
+        if (result == WhyFarther.configuration) {
+          Navigator.pushReplacementNamed(context, SettingsPage.routeName);
+        }
       },
-      itemBuilder: ( BuildContext context ) => <PopupMenuEntry<WhyFarther>> [
-        PopupMenuItem(
+      itemBuilder: (context) => <PopupMenuEntry<WhyFarther>>[
+        PopupMenuItem<WhyFarther>(
           value: WhyFarther.configuration,
           child: ListTile(
             title: Text(Languages.of(context).optionsPage),
             trailing: Icon(Icons.settings),
           ),
-        )
+        ),
       ],
     );
   }
-
 }

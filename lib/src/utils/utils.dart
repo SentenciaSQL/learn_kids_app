@@ -7,25 +7,24 @@ import 'package:learn_kids_app/src/classes/languages.dart';
 
 FlutterTts flutterTts = new FlutterTts();
 
-Locale _locale;
+Locale? _locale;
 
 String _language = '';
 
-int _avilable;
+int? _avilable;
 
-void playButton(BuildContext context, String letter){
-
-  getLocale().then((locale) async{
+void playButton(BuildContext context, String letter) {
+  getLocale().then((locale) async {
     _locale = locale;
-    if (_locale.languageCode == 'es') {
+    if (_locale?.languageCode == 'es') {
       _language = "es-ES";
-    } else if(_locale.languageCode == 'en') {
+    } else if (_locale?.languageCode == 'en') {
       _language = "en-US";
     }
 
     _avilable = await flutterTts.setLanguage(_language);
 
-    if (_avilable == 1 ) {
+    if (_avilable == 1) {
       await flutterTts.setLanguage(_language);
       await flutterTts.setSpeechRate(0.8);
       await flutterTts.setVolume(1.0);
@@ -39,7 +38,7 @@ void playButton(BuildContext context, String letter){
             title: Text(Languages.of(context).alert),
             content: Text(Languages.of(context).languageNotFound),
             actions: [
-              FlatButton(
+              TextButton(
                 child: Text('Ok'),
                 onPressed: () {
                   Navigator.of(dialogContext).pop(); // Dismiss alert dialog
@@ -51,7 +50,4 @@ void playButton(BuildContext context, String letter){
       );
     }
   });
-
-
-
 }

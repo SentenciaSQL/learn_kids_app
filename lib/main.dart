@@ -1,27 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:provider/provider.dart';
+
 import 'package:learn_kids_app/src/pages/home_page.dart';
 import 'package:learn_kids_app/src/routes/routes.dart';
 
+import 'package:learn_kids_app/src/delegates/app_localizations_delegate.dart';
 import 'package:learn_kids_app/src/preferences/preferences.dart';
 import 'package:learn_kids_app/src/preferences/preferences_user.dart';
 
-import 'package:learn_kids_app/src/delegates/app_localizations_delegate.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:learn_kids_app/src/preferences/theme_notifier.dart';
 
-import 'package:dynamic_theme/dynamic_theme.dart';
-
-void main() async{
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final prefs = new PreferencesUser();
-  prefs.initPrefs();
-  runApp(MyApp());
+
+  final prefs = PreferencesUser();
+  await prefs.initPrefs();
+
+  final theme = ThemeNotifier();
+  await theme.load();
+
+  runApp(
+    ChangeNotifierProvider.value(
+      value: theme,
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
-
   static void setLocale(BuildContext context, Locale newLocale) {
-    var state = context.findRootAncestorStateOfType<_MyAppState>();
-    state.setLocale(newLocale);
+    final state = context.findRootAncestorStateOfType<_MyAppState>();
+    state?.setLocale(newLocale);
   }
 
   @override
@@ -29,8 +39,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
-  Locale _locale;
+  Locale? _locale;
 
   void setLocale(Locale locale) {
     setState(() {
@@ -39,7 +48,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   @override
-  void didChangeDependencies() async{
+  void didChangeDependencies() {
     getLocale().then((locale) {
       setState(() {
         _locale = locale;
@@ -50,24 +59,22 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return new DynamicTheme(
-      defaultBrightness: Brightness.light,
-      data: (brightness) => new ThemeData(
-        primarySwatch: Colors.indigo,
-        brightness: brightness
-      ),
-      themedWidgetBuilder: (context, theme) {
-        return _setMian(context, theme);
-      },
+    final theme = context.watch<ThemeNotifier>();
+
+    final themeData = ThemeData(
+      primarySwatch: Colors.indigo,
+      brightness: theme.brightness,
     );
+
+    return _setMain(context, themeData);
   }
 
-  Widget _setMian( BuildContext context, ThemeData theme ) {
+  Widget _setMain(BuildContext context, ThemeData theme) {
     return MaterialApp(
       builder: (context, child) {
         return MediaQuery(
-            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
-            child: child
+          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+          child: child ?? const SizedBox.shrink(),
         );
       },
       debugShowCheckedModeBanner: false,
@@ -75,23 +82,24 @@ class _MyAppState extends State<MyApp> {
       title: 'Learn Kids App',
       initialRoute: HomePage.routeName,
       routes: getApplicationRoutes(),
-      supportedLocales: [
+      supportedLocales: const [
         Locale('en', ''),
-        Locale('es', '')
+        Locale('es', ''),
       ],
-      localizationsDelegates: [
+      localizationsDelegates: const [
         AppLocalizationsDelegate(),
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate
+        GlobalCupertinoLocalizations.delegate,
       ],
       localeResolutionCallback: (locale, supportedLocales) {
-        for (var supportedLocale in supportedLocales) {
-          if (supportedLocale?.languageCode == locale?.languageCode && supportedLocale?.countryCode == locale?.countryCode) {
+        for (final supportedLocale in supportedLocales) {
+          if (supportedLocale.languageCode == locale?.languageCode &&
+              supportedLocale.countryCode == locale?.countryCode) {
             return supportedLocale;
           }
         }
-        return supportedLocales?.first;
+        return supportedLocales.first;
       },
       theme: theme,
     );

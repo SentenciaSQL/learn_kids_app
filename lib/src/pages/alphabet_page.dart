@@ -8,7 +8,6 @@ import 'package:learn_kids_app/src/widgets/item_container_widget.dart';
 import 'package:learn_kids_app/src/preferences/preferences.dart';
 
 class AlphabetPage extends StatefulWidget {
-
   static final routeName = 'alphabet';
 
   @override
@@ -16,35 +15,37 @@ class AlphabetPage extends StatefulWidget {
 }
 
 class _AlphabetPageState extends State<AlphabetPage> {
-  String _locale;
+  String? _locale; // ahora nullable
 
   @override
   void didChangeDependencies() {
+    super.didChangeDependencies();
     getLocale().then((locale) {
+      if (!mounted) return;
       setState(() {
         _locale = locale.languageCode;
       });
     });
-    super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
-    //print('WHAT $_locale');
+    final isEs = _locale == 'es'; // seguro aunque sea null
+
     return Scaffold(
       appBar: AppBar(
         title: Text(Languages.of(context).alphabetPage),
       ),
       drawer: MenuWidget(),
       body: SafeArea(
-        child:  _createGridView(),
+        child: _createGridView(isEs),
       ),
       floatingActionButton: BackButtonWidget(),
       floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
     );
   }
 
-  Widget _createGridView() {
+  Widget _createGridView(bool isEs) {
     return CustomScrollView(
       primary: false,
       slivers: [
@@ -69,7 +70,10 @@ class _AlphabetPageState extends State<AlphabetPage> {
               ItemButtonWidget('l', '013-l.png', AlphabetPage.routeName),
               ItemButtonWidget('m', '014-m.png', AlphabetPage.routeName),
               ItemButtonWidget('n', '015-n.png', AlphabetPage.routeName),
-              if(_locale == 'es') ItemButtonWidget('ñ', '016-n.png', AlphabetPage.routeName),
+
+              if (isEs)
+                ItemButtonWidget('ñ', '016-n.png', AlphabetPage.routeName),
+
               ItemButtonWidget('o', '017-o.png', AlphabetPage.routeName),
               ItemButtonWidget('p', '018-p.png', AlphabetPage.routeName),
               ItemButtonWidget('q', '019-q.png', AlphabetPage.routeName),
@@ -82,8 +86,10 @@ class _AlphabetPageState extends State<AlphabetPage> {
               ItemButtonWidget('x', '026-x.png', AlphabetPage.routeName),
               ItemButtonWidget('y', '027-y.png', AlphabetPage.routeName),
               ItemButtonWidget('z', '028-z.png', AlphabetPage.routeName),
-              if(_locale == 'es') ItemButtonWidget('ch', '029-ch.png', AlphabetPage.routeName),
-              //if(_locale == 'es') ItemButtonWidget('ll', 'll.png', AlphabetPage.routeName),
+
+              if (isEs)
+                ItemButtonWidget('ch', '029-ch.png', AlphabetPage.routeName),
+              // if (isEs) ItemButtonWidget('ll', 'll.png', AlphabetPage.routeName),
             ],
           ),
         ),

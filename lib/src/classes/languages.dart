@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 abstract class Languages {
-
   static Languages of(BuildContext context) {
-    return Localizations.of<Languages>(context, Languages);
+    final result = Localizations.of<Languages>(context, Languages);
+    assert(result != null, 'No Languages found in context');
+    return result!;
   }
 
   String get appName;

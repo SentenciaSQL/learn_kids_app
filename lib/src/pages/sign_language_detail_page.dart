@@ -3,30 +3,28 @@ import 'package:learn_kids_app/src/widgets/back_button_widget.dart';
 import 'package:learn_kids_app/src/preferences/preferences_user.dart';
 
 class SignLanguageDetailPage extends StatelessWidget {
-
   static final routeName = 'sign_language_detail';
 
   @override
   Widget build(BuildContext context) {
+    final prefs = PreferencesUser();
+    final bool secondaryTheme = prefs.secondaryTheme;
 
-    bool _secondaryTheme;
+    final Color color = secondaryTheme ? Colors.black54 : Colors.indigo;
 
-    final prefs = new PreferencesUser();
-    _secondaryTheme = prefs.secondaryTheme;
+    final args = ModalRoute.of(context)?.settings.arguments;
+    final List<String> stringParams = (args as List).cast<String>();
 
-    final Color color = (_secondaryTheme) ? Colors.black54 : Colors.indigo;
-
-    final List<String> stringParams = ModalRoute.of(context).settings.arguments;
     final String stringImage = stringParams[1];
     final String stringName = stringParams[0];
-    final _screenSize = MediaQuery.of(context).size;
+    final screenSize = MediaQuery.of(context).size;
 
     return SafeArea(
       child: Scaffold(
         body: Column(
           children: [
-            _detailBodyHeader(stringImage, _screenSize.height, color),
-            _detailBody(stringName)
+            _detailBodyHeader(stringImage, screenSize.height, color),
+            _detailBody(stringName),
           ],
         ),
         floatingActionButton: BackButtonPopWidget(),
@@ -35,27 +33,27 @@ class SignLanguageDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _detailBodyHeader(String stringImage, var screenSize, Color color) {
+  Widget _detailBodyHeader(
+      String stringImage, double screenHeight, Color color) {
     return Container(
-      height: screenSize * 0.5,
+      height: screenHeight * 0.5,
       width: double.infinity,
-      decoration: BoxDecoration(
-        color: color,
+      decoration: BoxDecoration(color: color),
+      padding: const EdgeInsets.all(25),
+      child: Image(
+        image: AssetImage('assets/signLanguage/$stringImage.png'),
       ),
-      child: Container(
-        padding: EdgeInsets.all(25),
-        child: Image(
-          image: AssetImage('assets/signLanguage/$stringImage.png'),
-        ),
-      )
     );
   }
 
   Widget _detailBody(String stringName) {
     return Container(
-      padding: EdgeInsets.only(top: 80.0),
+      padding: const EdgeInsets.only(top: 80.0),
       child: Center(
-        child: Text(stringName[0].toUpperCase() + stringName.substring(1), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40),),
+        child: Text(
+          stringName[0].toUpperCase() + stringName.substring(1),
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 40),
+        ),
       ),
     );
   }
